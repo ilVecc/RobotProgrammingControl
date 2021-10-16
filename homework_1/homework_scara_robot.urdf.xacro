@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro"
+       name="homework_scara" >
+
+  <!-- homework_scara -->
+  <xacro:include filename="./homework_scara.urdf.xacro" />
+
+  <!-- arm -->
+  <xacro:homework_scara_robot prefix="" />
+
+  <link name="world" />
+
+  <joint name="world_joint" type="fixed">
+    <parent link="world" />
+    <child link="base_link" />
+    <origin xyz="0 0 0" rpy="0 0 0" />
+  </joint>
+
+</robot>

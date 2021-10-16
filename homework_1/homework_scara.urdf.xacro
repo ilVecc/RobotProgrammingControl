@@ -1,0 +1,152 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro">
+
+  <xacro:macro name="homework_scara_robot" params="prefix">
+    
+    <!-- Joint limits -->
+    <xacro:property name="shoulder_lower_limit" value="${-2.5}" />
+    <xacro:property name="shoulder_upper_limit" value="${ 2.5}" />
+    <xacro:property name="elbow_lower_limit" value="${-2.0}" />
+    <xacro:property name="elbow_upper_limit" value="${ 2.0}" />
+    <xacro:property name="wrist_lower_limit" value="${-3.0}" />
+    <xacro:property name="wrist_upper_limit" value="${ 3.0}" />
+    <xacro:property name="probe_lower_limit" value="${0.00}" />
+    <xacro:property name="probe_upper_limit" value="${0.45}" />
+
+    <!-- Kinematic model -->
+    <xacro:property name="L0h" value="0.40" />
+    <xacro:property name="L0l" value="0.25" />
+    <xacro:property name="L1h" value="0.30" />
+    <xacro:property name="L1l" value="0.20" />
+    <xacro:property name="L2h" value="0.30" />
+    <xacro:property name="L2l" value="0.15" />
+    <xacro:property name="L4h" value="0.50" />
+    <xacro:property name="L4r" value="0.05" />
+
+    <xacro:property name="d0" value="${L0h}" />
+    <xacro:property name="a1" value="${L1h}" />
+    <xacro:property name="a2" value="${L2h}" />
+    <xacro:property name="A3" value="${pi}" />
+
+    <xacro:property name="base_height" value="${L0h}" />
+    <xacro:property name="base_size" value="${L0l}" />
+    <xacro:property name="shoulder_length" value="${L1h}" />
+    <xacro:property name="shoulder_size" value="${L1l}" />
+    <xacro:property name="elbow_length" value="${L2h}" />
+    <xacro:property name="elbow_size" value="${L2l}" />
+    <xacro:property name="probe_length" value="${L4h}" />
+    <xacro:property name="probe_radius" value="${L4r}" />
+    <xacro:property name="ee_size" value="0.05" />
+
+    <material name="fixed">
+      <color rgba="0.7 0.7 0.7 1.0"/>
+    </material>
+    
+    <material name="revolute">
+      <color rgba="0.7 0.0 0.0 1.0"/>
+    </material>
+
+    <material name="prismatic">
+      <color rgba="0.0 0.7 0.0 1.0"/>
+    </material>
+
+    <link name="${prefix}base_link" >
+      <visual>
+        <geometry>
+          <box size="${base_size} ${base_size} ${base_height}"/>
+        </geometry>
+        <origin xyz="0 0 ${base_height / 2}" rpy="0 0 0" />
+        <material name="fixed" />
+      </visual>
+    </link>
+
+    <joint name="${prefix}shoulder_joint" type="revolute">
+      <parent link="${prefix}base_link" />
+      <child link="${prefix}shoulder_link" />
+      <origin xyz="0 0 ${base_height}" rpy="0 0 0" />
+      <axis xyz="0 0 1" />
+      <limit lower="${shoulder_lower_limit}" upper="${shoulder_upper_limit}" effort="150.0" velocity="3.15" />
+    </joint>
+
+    <link name="${prefix}shoulder_link">
+      <visual>
+        <geometry>
+          <box size="${shoulder_length} ${shoulder_size} ${shoulder_size}"/>
+        </geometry>
+        <origin xyz="${shoulder_length / 2} 0 0" rpy="0 0 0" />
+        <material name="revolute" />
+      </visual>
+    </link>
+
+    <joint name="${prefix}elbow_joint" type="revolute">
+      <parent link="${prefix}shoulder_link" />
+      <child link="${prefix}elbow_link" />
+      <origin xyz="${shoulder_length} 0 0" rpy="0 0 0" />
+      <axis xyz="0 0 1" />
+      <limit lower="${elbow_lower_limit}" upper="${elbow_upper_limit}" effort="150.0" velocity="3.15" />
+    </joint>
+
+    <link name="${prefix}elbow_link">
+      <visual>
+        <geometry>
+          <box size="${elbow_length} ${elbow_size} ${elbow_size}"/>
+        </geometry>
+        <origin xyz="${elbow_length / 2} 0 0" rpy="0 0 0" />
+        <material name="revolute" />
+      </visual>
+    </link>
+
+    <joint name="${prefix}wrist_joint" type="revolute">
+      <parent link="${prefix}elbow_link" />
+      <child link = "${prefix}wrist_link" />
+      <origin xyz="${elbow_length} 0 0" rpy="0 0 0" />
+      <axis xyz="0 0 1" />
+      <limit lower="${wrist_lower_limit}" upper="${wrist_upper_limit}" effort="150.0" velocity="3.15" />
+    </joint>
+
+    <link name="${prefix}wrist_link" />
+
+    <joint name="${prefix}probe_joint" type="prismatic">
+      <parent link="${prefix}wrist_link" />
+      <child link="${prefix}probe_link" />
+      <origin xyz="0 0 0" rpy="${pi} 0 0" />
+      <axis xyz="0 0 1" />
+      <limit lower="${probe_lower_limit}" upper="${probe_upper_limit}" effort="150.0" velocity="3.15" />
+    </joint>
+
+    <link name="${prefix}probe_link">
+      <visual>
+        <geometry>
+          <cylinder length="${probe_length}" radius="${probe_radius}" />
+        </geometry>
+        <origin xyz="0 0 ${-probe_length / 2}" rpy="0 0 0" />
+        <material name="prismatic" />
+      </visual>
+    </link>
+
+    <joint name="${prefix}ee_fixed_joint" type="fixed">
+      <parent link="${prefix}probe_link" />
+      <child link="${prefix}ee_link" />
+      <origin xyz="0 0 0" rpy="0 0 0" />
+    </joint>
+
+    <link name="${prefix}ee_link">
+      <visual>
+        <geometry>
+          <box size="${ee_size} ${ee_size} ${ee_size}" />
+        </geometry>
+        <origin xyz="0 0 ${ee_size / 2}" rpy="0 0 0" />
+        <material name="fixed" />
+      </visual>
+    </link>
+
+    <joint name="${prefix}tool0_fixed_joint" type="fixed">
+      <parent link="${prefix}ee_link" />
+      <child link="${prefix}tool0" />
+      <origin xyz="0 0 ${ee_size}" rpy="0 0 0" />
+    </joint>
+
+    <link name="tool0" />
+
+  </xacro:macro>
+</robot>
