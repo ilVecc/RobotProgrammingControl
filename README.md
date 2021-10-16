@@ -10,11 +10,11 @@ The workspace is thus the usual SCARA workspace, very similar to the one shown b
 Due to it's structure, we have an elbow singularity for most of the poses.
 
 
-The `homework_scara_robot.urdf.xacro` file contains the URDF file of the given robot. 
+The `homework_scara_robot.urdf.xacro` file is the URDF of the given robot. This can be viewed in Rviz using the command `roslaunch display.launch` (with argument `gui:=true` to also launch the `joint_state_controller_gui` and play with the joints).
 
 The `kinematics.py` file shows an example of FK/IK for the robot using the DH table and homogeneous matrices.
 
-The `ros_kinematics.py` file compares ROS TF and the previous manual computation, showing the same results.
+The `ros_kinematics.py` file compares ROS TF and the previous manual computation, showing the same results. This requires the URDF to be loaded as described above.
 
 
 Python2 and the `numpy`, `numpy-quaternion` packages are required.
