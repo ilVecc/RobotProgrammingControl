@@ -7,8 +7,10 @@ import tf
 from sensor_msgs.msg import JointState
 from kinematics import make_robot, h_to_pose
 
+
 def abs_error(x0, x1):
     return sum([abs(e0 - e1) for e0, e1 in zip(x0, x1)])
+
 
 if __name__ == "__main__":
     rospy.init_node("homework_scara_controller", anonymous=True)

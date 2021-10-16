@@ -16,7 +16,7 @@ from six.moves import input
 from moveit_commander.conversions import pose_to_list
 
 
-def all_close(goal, actual, tolerance):
+def all_close(goal, actual, tolerance=0.01):
     """
     Convenience method for testing if the values in two lists are within a tolerance of each other.
     For Pose and PoseStamped inputs, the angle between the two quaternions is compared (the angle
@@ -96,36 +96,11 @@ class MoveGroupUR5(object):
         self.display_trajectory_publisher = display_trajectory_publisher
   
     def check_state_near(self, goal_state, tolerance=0.01):
-        """
-        Convenience method for testing if the values in two lists are within a tolerance of each other.
-        For Pose and PoseStamped inputs, the angle between the two quaternions is compared (the angle
-        between the identical orientations q and -q is calculated correctly).
-        @param: goal       A list of floats, a Pose or a PoseStamped
-        @param: actual     A list of floats, a Pose or a PoseStamped
-        @param: tolerance  A float
-        @returns: bool
-        """
         if type(goal_state) is list:
             actual_state = self.move_group.get_current_joint_values()
-            for index in range(len(goal_state)):
-                if abs(actual_state[index] - goal_state[index]) > tolerance:
-                    return False
-        
-        elif type(goal_state) is geometry_msgs.msg.PoseStamped:
+        else:
             actual_state = self.move_group.get_current_pose()
-            return all_close(goal_state.pose, actual_state.pose, tolerance)
-        
-        elif type(goal_state) is geometry_msgs.msg.Pose:
-            actual_state = self.move_group.get_current_pose().pose
-            x0, y0, z0, qx0, qy0, qz0, qw0 = pose_to_list(actual_state)
-            x1, y1, z1, qx1, qy1, qz1, qw1 = pose_to_list(goal_state)
-            # Euclidean distance
-            d = np.sqrt((x1-x0)**2 + (y1-y0)**2 + (z1-z0)**2)
-            # phi = angle between orientations
-            cos_phi_half = abs(qx0 * qx1 + qy0 * qy1 + qz0 * qz1 + qw0 * qw1)
-            return d <= tolerance and cos_phi_half >= np.cos(tolerance / 2.0)
-        
-        return True
+        return all_close(goal_state, actual_state, tolerance)
     
     def go_to(self, goal):
         self.move_group.go(goal, wait=True)
@@ -205,11 +180,11 @@ class MoveGroupUR5(object):
         """
         Execute specific line trajectory
         """
-        pose = make_pose_rpy(self.move_group.get_planning_frame(), [0.3, 0.1, 0.3], [0, 0, 0]).pose
-        self.go_to(pose)
+        pose_stmp = make_pose_rpy(self.move_group.get_planning_frame(), [0.3, 0.1, 0.3], [0, 0, 0])
+        self.go_to(pose_stmp)
         rospy.sleep(rospy.Duration(secs=1))
-        pose.position.x += 0.2
-        plan, _ = self.line_to(pose)
+        pose_stmp.pose.position.x += 0.2
+        plan, _ = self.line_to(pose_stmp)
         self.move_group.execute(plan, wait=True)
 
     def task_6(self):
@@ -284,7 +259,6 @@ class MoveGroupUR5(object):
         assert self.wait_for_state_update(object_name, object_is_attached=True, object_is_known=False), "Could not attach %s".format(object_name)
 
     def detach_object(self, object_name):
-
         # detach the object from the planning scene:
         self.scene.remove_attached_object(self.move_group.get_end_effector_link(), name=object_name)
         assert self.wait_for_state_update(object_name, object_is_attached=False, object_is_known=True), "Could not detach %s".format(object_name)

@@ -22,9 +22,9 @@ Python2 and the `numpy`, `numpy-quaternion` packages are required.
 
 ## Homework 2: MoveIt! planning
 We were asked to implement some basic trajectory planning using the MoveIt! architecture. MoveIt! can be installed on ROS-Melodic simply with `sudo apt install ros-melodic-moveit`, so it's not required to manually compile it.
-On the other hand, the `universal_robot` bundle must be manually cloned and built in your catkin workspace. 
+On the other hand, the `universal_robot` bundle must be manually cloned and built in your catkin workspace. Then, the UR5 environment needed for this homework can be easily initialized with the `show_ur5.bash` file.
 
-The `moveit_ur5.py` file contains each sub-task, which are
+The `moveit_ur5.py` file contains the implementation of each sub-task, which are
 - go to a specific pose
 - go to a specific joint state
 - execute a line trajectory

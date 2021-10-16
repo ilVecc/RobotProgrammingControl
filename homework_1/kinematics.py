@@ -21,6 +21,9 @@ d4_max = 0.45
 
 
 class DH(object):
+    """
+    Class that implements a DH table, allowing also to compute forward kinematics.
+    """
 
     def __init__(self):
         super(DH, self).__init__()
@@ -76,11 +79,11 @@ class DH(object):
         return H
 
 
-def h_to_pose(h):
-    return quaternion.from_rotation_matrix(h[0:3, 0:3]), h[0:3,3]
-
-
 def ik(x, y, z, th):
+    """
+    Since inverse kinematics is not as easy as forward kinematics, 
+    we can't implement it directly inside the DH class.
+    """
 
     d4 = L0 - z
     assert d4_min <= d4 <= d4_max, "d4 does not comply with the limits"
@@ -101,6 +104,11 @@ def ik(x, y, z, th):
     return th1, th2, th3, d4
 
 
+def h_to_pose(h):
+    return quaternion.from_rotation_matrix(h[0:3, 0:3]), h[0:3,3]
+
+
+
 def make_robot():
     dh = DH()
     dh.add(  L0,     0,  0,     0)
@@ -114,16 +122,15 @@ def make_robot():
 
 if __name__ == "__main__":
 
-    """
-    The robot has elbow singularity in most of the workspace due to the th3 joint, which allows extra control on the ee pose.
-
-    The workspace is the classic SCARA workspace.
-    """
-
     dh = make_robot()
 
     js = [0.5, 1.2, -0.3, 0.4]
+    
+    ############################
+    # COMPUTE FORWARD KINEMATICS
+    ############################
     h = dh.fk(js)
+    # transform homogeneous matrix to position/quaternion pair
     q, t = h_to_pose(h)
     print("Pose of q =", js)
     print(" q =", q)
@@ -131,7 +138,12 @@ if __name__ == "__main__":
 
     print()
 
+    ############################
+    # COMPUTE INVERSE KINEMATICS
+    ############################
+    # easy way of getting the orientation in this specific case
     th = np.arctan2(h[0,1], h[0,0])
+    # get position as usual
     x, y, z = h[0:3,3]
     th1, th2, th3, d4 = ik(x, y, z, th)
     print("th1 =", th1)
