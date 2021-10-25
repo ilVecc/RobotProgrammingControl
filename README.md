@@ -1,3 +1,5 @@
+⚠️ Cari colleghi italiani: le star sono gratis 😉
+
 # Robot Programming & Control - High-level homework
 
 As part of the RPC course, students were asked to work on URDF files, FK/IK solvers and the MoveIt! architecture.
