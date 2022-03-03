@@ -1,4 +1,4 @@
-⚠️ Cari colleghi italiani: le star sono gratis 😉
+⚠ Dear UNIVR colleagues, stars are free of charge ;) ⚠
 
 # Robot Programming & Control - High-level homework
 
